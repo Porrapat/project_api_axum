@@ -7,19 +7,19 @@ use axum::{
     response::Html
 };
 
-// mod handlers;
+mod handlers;
 mod models;
 
-// use handlers::*;
+use handlers::*;
 
 #[tokio::main]
 async fn main() {
     let app = Router::new()
         .route("/", get(handler))
-        .route("/mystr", get(handler_mystr));
-        // .route("/question", post(create_question))
-        // .route("/questions", get(read_questions))
-        // .route("/question", delete(delete_question))
+        .route("/mystr", get(handler_mystr))
+        .route("/question", post(create_question))
+        .route("/questions", get(read_questions))
+        .route("/question", delete(delete_question));
         // .route("/answer", post(create_answer))
         // .route("/answers", get(read_answers))
         // .route("/answer", delete(delete_answer));

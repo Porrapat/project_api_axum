@@ -1,18 +1,31 @@
 use crate::models::*;
 use axum::{response::IntoResponse, Json};
-
+use serde_json::json;
 // ---- CRUD for Questions ----
 
 pub async fn create_question(Json(question): Json<Question>) -> impl IntoResponse {
-    todo!()
+    // todo!()
+    Json(json!({
+        "status": "ok 1",
+        // "received": question
+    }))
 }
 
 pub async fn read_questions() -> impl IntoResponse {
-    todo!()
+    // todo!()
+    Json(json!({
+        "status": "ok 2",
+        // "received": question
+    }))
 }
 
 pub async fn delete_question(Json(question_uuid): Json<QuestionId>) {
-    todo!()
+    // todo!()
+    // Json(json!({
+    //     "status": "ok 3",
+    //     // "received": question
+    // }))
+    // Json()
 }
 
 // ---- CRUD for Answers ----
