@@ -25,7 +25,7 @@ pub async fn create_answer(Json(question): Json<Answer>) -> impl IntoResponse {
     }))
 }
 
-pub async fn read_answers(Json(question_uuid): Json<QuestionId>) -> impl IntoResponse {
+pub async fn read_answers() -> impl IntoResponse {
     Json(json!({
         "status": "ok answer 2",
     }))
