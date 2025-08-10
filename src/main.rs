@@ -7,7 +7,7 @@ use axum::{
 };
 
 // mod handlers;
-// mod models;
+mod models;
 
 // use handlers::*;
 
