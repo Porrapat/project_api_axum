@@ -17,4 +17,4 @@
 #   "content": "What is Rust?"
 # }
 
-GET http://localhost:8000/answers
+GET http://localhost:8000/answers/asdf

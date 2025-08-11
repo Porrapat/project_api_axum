@@ -1,5 +1,5 @@
 use crate::models::*;
-use axum::{response::IntoResponse, Json};
+use axum::{extract::{Path}, response::IntoResponse, Json};
 use serde_json::json;
 // ---- CRUD for Questions ----
 
@@ -66,36 +66,36 @@ pub async fn create_answer(Json(question): Json<Answer>) -> impl IntoResponse {
     }))
 }
 
-pub async fn read_answers() -> impl IntoResponse {
+pub async fn read_answers(Path(question_uuid): Path<String>) -> impl IntoResponse {
     info!("********* read_answers *********");
     Json(json!(vec![
         AnswerDetail {
             answer_uuid: "aaaa".to_owned(),
-            question_uuid: "abced".to_owned(),
+            question_uuid: question_uuid.to_owned(),
             content: "This is content".to_owned(),
             created_at: "2025-08-11 12:00:00".to_owned()
         },
         AnswerDetail {
             answer_uuid: "aaaa".to_owned(),
-            question_uuid: "abced".to_owned(),
+            question_uuid: question_uuid.to_owned(),
             content: "This is content".to_owned(),
             created_at: "2025-08-11 12:00:00".to_owned()
         },
         AnswerDetail {
             answer_uuid: "aaaa".to_owned(),
-            question_uuid: "abced".to_owned(),
+            question_uuid: question_uuid.to_owned(),
             content: "This is content".to_owned(),
             created_at: "2025-08-11 12:00:00".to_owned()
         },
         AnswerDetail {
             answer_uuid: "aaaa".to_owned(),
-            question_uuid: "abced".to_owned(),
+            question_uuid: question_uuid.to_owned(),
             content: "This is content".to_owned(),
             created_at: "2025-08-11 12:00:00".to_owned()
         },
         AnswerDetail {
             answer_uuid: "aaaa".to_owned(),
-            question_uuid: "abced".to_owned(),
+            question_uuid: question_uuid.to_owned(),
             content: "This is content".to_owned(),
             created_at: "2025-08-11 12:00:00".to_owned()
         }
