@@ -29,9 +29,26 @@ pub async fn create_question(Json(question): Json<Question>) -> impl IntoRespons
 
 pub async fn read_questions() -> impl IntoResponse {
     info!("********* read_questions *********");
-    Json(json!({
-        "status": "ok 2",
-    }))
+    Json(json!(vec![
+        QuestionDetail {
+            question_uuid: "abced".to_owned(),
+            title: "My title 1".to_owned(),
+            description: "My Description".to_owned(),
+            created_at: "2025-08-11 12:00:00".to_owned()
+        },
+        QuestionDetail {
+            question_uuid: "abced".to_owned(),
+            title: "My title 2".to_owned(),
+            description: "My Description".to_owned(),
+            created_at: "2025-08-11 12:00:00".to_owned()
+        },
+        QuestionDetail {
+            question_uuid: "abced".to_owned(),
+            title: "My title 3".to_owned(),
+            description: "My Description".to_owned(),
+            created_at: "2025-08-11 12:00:00".to_owned()
+        }
+    ]))
 }
 
 pub async fn delete_question(Json(question_uuid): Json<QuestionId>) {
