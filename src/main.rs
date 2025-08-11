@@ -20,6 +20,13 @@ use sqlx::postgres::PgPoolOptions;
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
+use persistance::{
+    answers_dao::{AnswersDao, AnswersDaoImpl},
+    questions_dao::{QuestionsDao, QuestionsDaoImpl},
+};
+
+use models::Question;
+
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init();
@@ -33,13 +40,23 @@ async fn main() {
         .await
         .expect("Failed to create Postgres connection pool!");
 
-    let recs = sqlx::query!("SELECT * FROM questions")
-        .fetch_all(&pool)
-        .await
-        .unwrap();
+    let doa = QuestionsDaoImpl::new(pool);
 
-    info!("********* Question Records *********");
-    info!("{:?}", recs);
+    let result = doa
+        .create_question(Question {
+            title: "test xxx title".to_owned(),
+            description: "test xxx description".to_owned(),
+        })
+        .await
+        .map_err(|e| format!("{:?}", e)).expect("Error HERE!!!!!");
+
+    // let recs = sqlx::query!("SELECT * FROM questions")
+    //     .fetch_all(&pool)
+    //     .await
+    //     .unwrap();
+
+    // info!("********* Question Records *********");
+    // info!("{:?}", recs);
 
     let app = Router::new()
         .route("/", get(handler))
