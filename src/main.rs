@@ -14,7 +14,6 @@ use handlers::*;
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
-// use log::{info, trace, warn};
 
 #[tokio::main]
 async fn main() {
