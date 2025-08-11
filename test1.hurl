@@ -30,7 +30,7 @@ Content-Type: application/json
 HTTP/1.1 200
 
 # GET /answers
-GET http://localhost:8000/answers
+GET http://localhost:8000/answers/myuuid
 HTTP/1.1 200
 
 
