@@ -58,16 +58,48 @@ pub async fn delete_question(Json(question_uuid): Json<QuestionId>) {
 // ---- CRUD for Answers ----
 pub async fn create_answer(Json(question): Json<Answer>) -> impl IntoResponse {
     info!("********* create_answer *********");
-    Json(json!({
-        "status": "ok answer 1",
+    Json(json!(AnswerDetail {
+        answer_uuid: "aaaa".to_owned(),
+        question_uuid: "abced".to_owned(),
+        content: "This is content".to_owned(),
+        created_at: "2025-08-11 12:00:00".to_owned()
     }))
 }
 
 pub async fn read_answers() -> impl IntoResponse {
     info!("********* read_answers *********");
-    Json(json!({
-        "status": "ok answer 2",
-    }))
+    Json(json!(vec![
+        AnswerDetail {
+            answer_uuid: "aaaa".to_owned(),
+            question_uuid: "abced".to_owned(),
+            content: "This is content".to_owned(),
+            created_at: "2025-08-11 12:00:00".to_owned()
+        },
+        AnswerDetail {
+            answer_uuid: "aaaa".to_owned(),
+            question_uuid: "abced".to_owned(),
+            content: "This is content".to_owned(),
+            created_at: "2025-08-11 12:00:00".to_owned()
+        },
+        AnswerDetail {
+            answer_uuid: "aaaa".to_owned(),
+            question_uuid: "abced".to_owned(),
+            content: "This is content".to_owned(),
+            created_at: "2025-08-11 12:00:00".to_owned()
+        },
+        AnswerDetail {
+            answer_uuid: "aaaa".to_owned(),
+            question_uuid: "abced".to_owned(),
+            content: "This is content".to_owned(),
+            created_at: "2025-08-11 12:00:00".to_owned()
+        },
+        AnswerDetail {
+            answer_uuid: "aaaa".to_owned(),
+            question_uuid: "abced".to_owned(),
+            content: "This is content".to_owned(),
+            created_at: "2025-08-11 12:00:00".to_owned()
+        }
+    ]))
 }
 
 pub async fn delete_answer(Json(answer_uuid): Json<AnswerId>) {
