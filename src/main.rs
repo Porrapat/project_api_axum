@@ -18,8 +18,8 @@ extern crate pretty_env_logger;
 
 #[tokio::main]
 async fn main() {
-
-    // TODO: Initialize pretty_env_logger
+    pretty_env_logger::init();
+    info!("********* Question Records *********");
     // TODO: Initialize dotenv
 
     // Create a new PgPoolOptions instance with a maximum of 5 connections.
@@ -33,9 +33,7 @@ async fn main() {
     // Use the `unwrap` or `expect` method to handle errors. This is just some test code to
     // make sure we can connect to the database.
     // let recs = todo!();
-    pretty_env_logger::init();
 
-    info!("********* Question Records *********");
     // warn!("********* Question Records Warn *********");
 
     // println!("Hello before start server");
