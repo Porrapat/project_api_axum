@@ -12,6 +12,8 @@ mod models;
 
 use handlers::*;
 
+use dotenvy::dotenv;
+
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
@@ -20,6 +22,10 @@ async fn main() {
     pretty_env_logger::init();
     info!("********* Question Records *********");
     // TODO: Initialize dotenv
+
+    dotenv().ok();
+    let my_database_url = &std::env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
+    info!("********* {my_database_url} *********");
 
     // Create a new PgPoolOptions instance with a maximum of 5 connections.
     // Use dotenv to get the database url.
