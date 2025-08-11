@@ -34,11 +34,6 @@ async fn main() {
     // make sure we can connect to the database.
     // let recs = todo!();
 
-    // warn!("********* Question Records Warn *********");
-
-    // println!("Hello before start server");
-    // TODO: Log recs with debug formatting using the info! macro
-
     let app = Router::new()
         .route("/", get(handler))
         .route("/mystr", get(handler_mystr))
