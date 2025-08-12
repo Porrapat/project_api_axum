@@ -45,8 +45,10 @@ async fn main() {
     // let results = doa.get_questions().await.expect("Error Here!!!!");
     // println!("{:?}", results);
 
-    let a_doa = AnswersDaoImpl::new(pool);
-
+    // let a_doa = AnswersDaoImpl::new(pool);
+    // println!("Before Delete");
+    // a_doa.delete_answer("55790455-57b8-4acd-9a93-d295d4328e".to_owned()).await.expect("Error Here!!!!");
+    // println!("Delete OK");
     // let a_results = a_doa.get_answers("82152280-b5ce-44b1-aac4-7c4a2fae8bfe".to_owned()).await.expect("Error Here!!!!");
     // println!("{:?}", a_results);
     // let result = doa
