@@ -2,7 +2,7 @@ use crate::models::*;
 use axum::{extract::{Path}, response::IntoResponse, Json};
 use serde_json::json;
 
-// mod handlers_inner;
+mod handlers_inner;
 // ---- CRUD for Questions ----
 
 pub async fn create_question(Json(question): Json<Question>) -> impl IntoResponse {
