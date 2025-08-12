@@ -40,15 +40,22 @@ async fn main() {
         .await
         .expect("Failed to create Postgres connection pool!");
 
-    let doa = QuestionsDaoImpl::new(pool);
+    // let doa = QuestionsDaoImpl::new(pool);
 
-    let result = doa
-        .create_question(Question {
-            title: "test xxx title".to_owned(),
-            description: "test xxx description".to_owned(),
-        })
-        .await
-        .map_err(|e| format!("{:?}", e)).expect("Error HERE!!!!!");
+    // let results = doa.get_questions().await.expect("Error Here!!!!");
+    // println!("{:?}", results);
+
+    let a_doa = AnswersDaoImpl::new(pool);
+
+    // let a_results = a_doa.get_answers("82152280-b5ce-44b1-aac4-7c4a2fae8bfe".to_owned()).await.expect("Error Here!!!!");
+    // println!("{:?}", a_results);
+    // let result = doa
+    //     .create_question(Question {
+    //         title: "test xxx title".to_owned(),
+    //         description: "test xxx description".to_owned(),
+    //     })
+    //     .await
+    //     .map_err(|e| format!("{:?}", e)).expect("Error HERE!!!!!");
 
     // let recs = sqlx::query!("SELECT * FROM questions")
     //     .fetch_all(&pool)
