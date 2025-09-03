@@ -1,17 +1,22 @@
-use actix_web::{web, HttpResponse, Result as ActixResult};
+use poem::{
+    web::{Data, Json, Path},
+    Result as PoemResult, Response,
+    http::StatusCode,
+    handler,
+};
 
 use crate::{models::*, AppState};
 
 mod handlers_inner;
 
-impl From<handlers_inner::HandlerError> for HttpResponse {
+impl From<handlers_inner::HandlerError> for poem::Error {
     fn from(error: handlers_inner::HandlerError) -> Self {
         match error {
             handlers_inner::HandlerError::BadRequest(msg) => {
-                HttpResponse::BadRequest().json(serde_json::json!({"error": msg}))
+                poem::Error::from_string(msg, StatusCode::BAD_REQUEST)
             }
             handlers_inner::HandlerError::InternalError(msg) => {
-                HttpResponse::InternalServerError().json(serde_json::json!({"error": msg}))
+                poem::Error::from_string(msg, StatusCode::INTERNAL_SERVER_ERROR)
             }
         }
     }
@@ -19,66 +24,75 @@ impl From<handlers_inner::HandlerError> for HttpResponse {
 
 // ---- CRUD for Questions ----
 
+#[handler]
 pub async fn create_question(
-    app_state: web::Data<AppState>,
-    question: web::Json<Question>,
-) -> ActixResult<HttpResponse> {
-    match handlers_inner::create_question(question.into_inner(), app_state.questions_dao.as_ref()).await {
-        Ok(question_detail) => Ok(HttpResponse::Ok().json(question_detail)),
-        Err(error) => Ok(error.into()),
+    Data(app_state): Data<&AppState>,
+    Json(question): Json<Question>,
+) -> PoemResult<Json<QuestionDetail>> {
+    match handlers_inner::create_question(question, app_state.questions_dao.as_ref()).await {
+        Ok(question_detail) => Ok(Json(question_detail)),
+        Err(error) => Err(error.into()),
     }
 }
 
+#[handler]
 pub async fn read_questions(
-    app_state: web::Data<AppState>,
-) -> ActixResult<HttpResponse> {
+    Data(app_state): Data<&AppState>,
+) -> PoemResult<Json<Vec<QuestionDetail>>> {
     match handlers_inner::read_questions(app_state.questions_dao.as_ref()).await {
-        Ok(questions) => Ok(HttpResponse::Ok().json(questions)),
-        Err(error) => Ok(error.into()),
+        Ok(questions) => Ok(Json(questions)),
+        Err(error) => Err(error.into()),
     }
 }
 
+#[handler]
 pub async fn delete_question(
-    app_state: web::Data<AppState>,
-    question_uuid: web::Json<QuestionId>,
-) -> ActixResult<HttpResponse> {
-    match handlers_inner::delete_question(question_uuid.into_inner(), app_state.questions_dao.as_ref()).await {
-        Ok(_) => Ok(HttpResponse::Ok().json(serde_json::json!({"message": "Question deleted successfully"}))),
-        Err(error) => Ok(error.into()),
+    Data(app_state): Data<&AppState>,
+    Json(question_uuid): Json<QuestionId>,
+) -> PoemResult<Response> {
+    match handlers_inner::delete_question(question_uuid, app_state.questions_dao.as_ref()).await {
+        Ok(_) => Ok(Response::builder()
+            .status(StatusCode::OK)
+            .body(serde_json::json!({"message": "Question deleted successfully"}).to_string())),
+        Err(error) => Err(error.into()),
     }
 }
 
 // ---- CRUD for Answers ----
 
+#[handler]
 pub async fn create_answer(
-    app_state: web::Data<AppState>,
-    answer: web::Json<Answer>,
-) -> ActixResult<HttpResponse> {
-    match handlers_inner::create_answer(answer.into_inner(), app_state.answers_dao.as_ref()).await {
-        Ok(answer_detail) => Ok(HttpResponse::Ok().json(answer_detail)),
-        Err(error) => Ok(error.into()),
+    Data(app_state): Data<&AppState>,
+    Json(answer): Json<Answer>,
+) -> PoemResult<Json<AnswerDetail>> {
+    match handlers_inner::create_answer(answer, app_state.answers_dao.as_ref()).await {
+        Ok(answer_detail) => Ok(Json(answer_detail)),
+        Err(error) => Err(error.into()),
     }
 }
 
+#[handler]
 pub async fn read_answers(
-    app_state: web::Data<AppState>,
-    path: web::Path<String>,
-) -> ActixResult<HttpResponse> {
-    let question_uuid = path.into_inner();
+    Data(app_state): Data<&AppState>,
+    Path(question_uuid): Path<String>,
+) -> PoemResult<Json<Vec<AnswerDetail>>> {
     let question_id = QuestionId { question_uuid };
     
     match handlers_inner::read_answers(question_id, app_state.answers_dao.as_ref()).await {
-        Ok(answers) => Ok(HttpResponse::Ok().json(answers)),
-        Err(error) => Ok(error.into()),
+        Ok(answers) => Ok(Json(answers)),
+        Err(error) => Err(error.into()),
     }
 }
 
+#[handler]
 pub async fn delete_answer(
-    app_state: web::Data<AppState>,
-    answer_uuid: web::Json<AnswerId>,
-) -> ActixResult<HttpResponse> {
-    match handlers_inner::delete_answer(answer_uuid.into_inner(), app_state.answers_dao.as_ref()).await {
-        Ok(_) => Ok(HttpResponse::Ok().json(serde_json::json!({"message": "Answer deleted successfully"}))),
-        Err(error) => Ok(error.into()),
+    Data(app_state): Data<&AppState>,
+    Json(answer_uuid): Json<AnswerId>,
+) -> PoemResult<Response> {
+    match handlers_inner::delete_answer(answer_uuid, app_state.answers_dao.as_ref()).await {
+        Ok(_) => Ok(Response::builder()
+            .status(StatusCode::OK)
+            .body(serde_json::json!({"message": "Answer deleted successfully"}).to_string())),
+        Err(error) => Err(error.into()),
     }
 }

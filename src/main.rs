@@ -5,7 +5,11 @@ extern crate pretty_env_logger;
 
 use std::sync::Arc;
 
-use actix_web::{web, App, HttpServer, middleware::Logger};
+use poem::{
+    listener::TcpListener,
+    middleware::Tracing,
+    Route, Server, EndpointExt,
+};
 use dotenvy::dotenv;
 
 use persistance::{
@@ -26,8 +30,8 @@ pub struct AppState {
     pub answers_dao: Arc<dyn AnswersDao + Send + Sync>,
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+#[tokio::main]
+async fn main() -> Result<(), std::io::Error> {
     pretty_env_logger::init();
     dotenv().ok();
 
@@ -45,18 +49,15 @@ async fn main() -> std::io::Result<()> {
         answers_dao,
     };
 
-    HttpServer::new(move || {
-        App::new()
-            .app_data(web::Data::new(app_state.clone()))
-            .wrap(Logger::default())
-            .route("/question", web::post().to(create_question))
-            .route("/questions", web::get().to(read_questions))
-            .route("/question", web::delete().to(delete_question))
-            .route("/answer", web::post().to(create_answer))
-            .route("/answers/{question_uuid}", web::get().to(read_answers))
-            .route("/answer", web::delete().to(delete_answer))
-    })
-    .bind("127.0.0.1:8000")?
-    .run()
-    .await
+    let app = Route::new()
+        .at("/question", poem::post(create_question).delete(delete_question))
+        .at("/questions", poem::get(read_questions))
+        .at("/answer", poem::post(create_answer).delete(delete_answer))
+        .at("/answers/:question_uuid", poem::get(read_answers))
+        .with(Tracing)
+        .data(app_state);
+
+    Server::new(TcpListener::bind("127.0.0.1:8000"))
+        .run(app)
+        .await
 }
