@@ -5,10 +5,7 @@ extern crate pretty_env_logger;
 
 use std::sync::Arc;
 
-use axum::{
-    routing::{delete, get, post},
-    Router,
-};
+use actix_web::{web, App, HttpServer, middleware::Logger};
 use dotenvy::dotenv;
 
 use persistance::{
@@ -29,8 +26,8 @@ pub struct AppState {
     pub answers_dao: Arc<dyn AnswersDao + Send + Sync>,
 }
 
-#[tokio::main]
-async fn main() {
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     pretty_env_logger::init();
     dotenv().ok();
 
@@ -48,18 +45,18 @@ async fn main() {
         answers_dao,
     };
 
-    let app = Router::new()
-        .route("/question", post(create_question))
-        .route("/questions", get(read_questions))
-        .route("/question", delete(delete_question))
-        .route("/answer", post(create_answer))
-        .route("/answers/{question_uuid}", get(read_answers))
-        .route("/answer", delete(delete_answer))
-        .with_state(app_state);
-
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
-        .await
-        .unwrap();
-
-    axum::serve(listener, app).await.unwrap();
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(app_state.clone()))
+            .wrap(Logger::default())
+            .route("/question", web::post().to(create_question))
+            .route("/questions", web::get().to(read_questions))
+            .route("/question", web::delete().to(delete_question))
+            .route("/answer", web::post().to(create_answer))
+            .route("/answers/{question_uuid}", web::get().to(read_answers))
+            .route("/answer", web::delete().to(delete_answer))
+    })
+    .bind("127.0.0.1:8000")?
+    .run()
+    .await
 }

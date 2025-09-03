@@ -1,5 +1,5 @@
 [package]
-name = "project_api_axum"
+name = "project_api_actix"
 version = "0.1.0"
 edition = "2024"
 
@@ -9,7 +9,7 @@ serde_json = "1.0.142"
 tokio = { version = "1.47.1", features = ["full"] }
 sqlx = { version = "0.8.6", features = [ "runtime-tokio-rustls" , "postgres", "time", "uuid"] }
 dotenvy = "0.15.7"
-axum = "0.8.4"
+actix-web = "4.9.0"
 log = "0.4.27"
 pretty_env_logger = "0.5.0"
 async-trait = "0.1.88"
