@@ -53,7 +53,7 @@ async fn main() {
         .route("/questions", get(read_questions))
         .route("/question", delete(delete_question))
         .route("/answer", post(create_answer))
-        .route("/answers", get(read_answers))
+        .route("/answers/{question_uuid}", get(read_answers))
         .route("/answer", delete(delete_answer))
         .with_state(app_state);
 

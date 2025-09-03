@@ -1,5 +1,5 @@
 use axum::{
-    extract::State as AxumState, http::StatusCode, response::IntoResponse, Json as JsonAxum,
+    extract::{Path, State as AxumState}, http::StatusCode, response::IntoResponse, Json as JsonAxum,
 };
 
 use crate::{models::*, AppState};
@@ -58,9 +58,10 @@ pub async fn create_answer(
 
 pub async fn read_answers(
     AxumState(AppState { answers_dao, .. }): AxumState<AppState>,
-    JsonAxum(question_uuid): JsonAxum<QuestionId>,
+    Path(question_uuid): Path<String>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
-    handlers_inner::read_answers(question_uuid, answers_dao.as_ref())
+    let question_id = QuestionId { question_uuid };
+    handlers_inner::read_answers(question_id, answers_dao.as_ref())
         .await
         .map(JsonAxum)
 }
