@@ -4,8 +4,9 @@ extern crate log;
 extern crate pretty_env_logger;
 
 use std::sync::Arc;
+use std::convert::Infallible;
 
-use actix_web::{web, App, HttpServer, middleware::Logger};
+use warp::Filter;
 use dotenvy::dotenv;
 
 use persistance::{
@@ -18,7 +19,7 @@ mod handlers;
 mod models;
 mod persistance;
 
-use handlers::*;
+use handlers::{handle_rejection, *};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -26,8 +27,14 @@ pub struct AppState {
     pub answers_dao: Arc<dyn AnswersDao + Send + Sync>,
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+fn with_app_state(
+    app_state: AppState,
+) -> impl Filter<Extract = (AppState,), Error = Infallible> + Clone {
+    warp::any().map(move || app_state.clone())
+}
+
+#[tokio::main]
+async fn main() {
     pretty_env_logger::init();
     dotenv().ok();
 
@@ -45,18 +52,54 @@ async fn main() -> std::io::Result<()> {
         answers_dao,
     };
 
-    HttpServer::new(move || {
-        App::new()
-            .app_data(web::Data::new(app_state.clone()))
-            .wrap(Logger::default())
-            .route("/question", web::post().to(create_question))
-            .route("/questions", web::get().to(read_questions))
-            .route("/question", web::delete().to(delete_question))
-            .route("/answer", web::post().to(create_answer))
-            .route("/answers/{question_uuid}", web::get().to(read_answers))
-            .route("/answer", web::delete().to(delete_answer))
-    })
-    .bind("127.0.0.1:8000")?
-    .run()
-    .await
+    // Question routes
+    let create_question = warp::path("question")
+        .and(warp::post())
+        .and(warp::body::json())
+        .and(with_app_state(app_state.clone()))
+        .and_then(create_question);
+
+    let read_questions = warp::path("questions")
+        .and(warp::get())
+        .and(with_app_state(app_state.clone()))
+        .and_then(read_questions);
+
+    let delete_question = warp::path("question")
+        .and(warp::delete())
+        .and(warp::body::json())
+        .and(with_app_state(app_state.clone()))
+        .and_then(delete_question);
+
+    // Answer routes
+    let create_answer = warp::path("answer")
+        .and(warp::post())
+        .and(warp::body::json())
+        .and(with_app_state(app_state.clone()))
+        .and_then(create_answer);
+
+    let read_answers = warp::path("answers")
+        .and(warp::path::param::<String>())
+        .and(warp::get())
+        .and(with_app_state(app_state.clone()))
+        .and_then(read_answers);
+
+    let delete_answer = warp::path("answer")
+        .and(warp::delete())
+        .and(warp::body::json())
+        .and(with_app_state(app_state.clone()))
+        .and_then(delete_answer);
+
+    let routes = create_question
+        .or(read_questions)
+        .or(delete_question)
+        .or(create_answer)
+        .or(read_answers)
+        .or(delete_answer)
+        .with(warp::log("api"))
+        .recover(handle_rejection);
+
+    println!("Starting server on 127.0.0.1:8000");
+    warp::serve(routes)
+        .run(([127, 0, 0, 1], 8000))
+        .await;
 }
